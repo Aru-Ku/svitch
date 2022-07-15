@@ -1,0 +1,41 @@
+name: Build and Publish Svitch
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: npm ci
+      - name: Uploading Build Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: .
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+      - name: Retrieving Build Files
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+      - name: Publishing Package
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
