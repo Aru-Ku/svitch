@@ -17,11 +17,15 @@ jobs:
         with:
           node-version: 12
       - run: npm ci
+      - run: npm run build
       - name: Uploading Build Files
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: .
+          path: |
+            dist
+            src
+            package.json
 
   publish:
     runs-on: ubuntu-latest
